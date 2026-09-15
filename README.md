@@ -4,16 +4,19 @@
 - Juan Fuentes
 - Esteban Forrero
 - Pierre Puentes
+- Maicol Gamboa
 
 ## Descripción del Proyecto
-Núcleo de procesamiento, validación y almacenamiento dinámico de datos para la Red de Monitoreo Ambiental. Desarrollado en Java puro sin bases de datos externas, aplicando estructuras de datos modulares (TAD), matrices bidimensionales, control de excepciones y trazabilidad estricta con Git.
+Núcleo de procesamiento, validación y almacenamiento dinámico de datos para la Red de Monitoreo Ambiental Urbano. Desarrollado en Java puro sin bases de datos externas, aplicando estructuras de datos modulares (TAD), matrices bidimensionales, control de excepciones y trazabilidad estricta con Git.
 
 ## Estructura del Proyecto
-- `src/`: Contiene el código fuente del motor de ingesta, estructuras de datos y matrices.
-- `data/`: Contiene el dataset de prueba (`lecturas.csv`).
-- `bitacoras/`: Almacena las bitáctoras grupales de seguimiento de cada hito semanal.
+- `src/`: Código fuente en Java (`ProcesadorIngesta`, `RepositorioLecturas`, `MatrizEstacionHora`, `Main`).
+- `data/`: Dataset de pruebas en formato CSV (`lecturas.csv`).
+- `bitacoras/`: Documentación y seguimiento de hitos semanales del equipo.
 
 ## Ejecución
 1. Compilar los archivos fuente desde la raíz:
    ```bash
-   javac src/*.java
+   cd src
+   javac *.java
+   cd ..
