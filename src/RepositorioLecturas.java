@@ -1,43 +1,92 @@
 package src;
 
 public class RepositorioLecturas {
+
     private LecturaSensor[] lecturas;
-    private int tamanio;
-    private static final int CAPACIDAD_INICIAL = 10;
+    private int cantidad;
+    private int copiasRealizadas;
+    private int redimensionamientos;
 
-    public RepositorioLecturas() {
-        this.lecturas = new LecturaSensor[CAPACIDAD_INICIAL];
-        this.tamanio = 0;
-    }
-
-    public void agregar(LecturaSensor lectura) {
-        if (tamanio == lecturas.length) {
-            redimensionar();
-        }
-        lecturas[tamanio] = lectura;
-        tamanio++;
+    public RepositorioLecturas(int capacidadInicial) {
+        this.lecturas = new LecturaSensor[capacidadInicial];
+        this.cantidad = 0;
+        this.copiasRealizadas = 0;
+        this.redimensionamientos = 0;
     }
 
     private void redimensionar() {
-        LecturaSensor[] nuevoArreglo = new LecturaSensor[lecturas.length * 2];
-        for (int i = 0; i < lecturas.length; i++) {
-            nuevoArreglo[i] = lecturas[i];
+        int nuevaCapacidad = lecturas.length * 2;
+        LecturaSensor[] nuevo = new LecturaSensor[nuevaCapacidad];
+        
+        for (int i = 0; i < cantidad; i++) {
+            nuevo[i] = lecturas[i];
+            copiasRealizadas++;
         }
-        this.lecturas = nuevoArreglo;
+        
+        lecturas = nuevo;
+        redimensionamientos++;
     }
 
-    public LecturaSensor obtener(int indice) {
-        if (indice < 0 || indice >= tamanio) {
-            throw new IndexOutOfBoundsException("Índice fuera de rango: " + indice);
+    public boolean agregar(LecturaSensor lectura) {
+        if (lectura == null) return false;
+        if (cantidad >= lecturas.length) {
+            redimensionar();
         }
-        return lecturas[indice];
+        lecturas[cantidad] = lectura;
+        cantidad++;
+        return true;
     }
 
-    public int getTamanio() {
-        return tamanio;
+    public LecturaSensor obtener(int posicion) {
+        if (posicion < 0 || posicion >= cantidad) {
+            return null;
+        }
+        return lecturas[posicion];
     }
 
-    public int getCapacidad() {
+    public LecturaSensor buscarPorEstacion(String idEstacion) {
+        if (idEstacion == null) return null;
+        for (int i = 0; i < cantidad; i++) {
+            if (lecturas[i].getIdEstacion().equalsIgnoreCase(idEstacion)) {
+                return lecturas[i];
+            }
+        }
+        return null;
+    }
+
+    public boolean actualizar(int posicion, LecturaSensor nueva) {
+        if (posicion < 0 || posicion >= cantidad || nueva == null) {
+            return false;
+        }
+        lecturas[posicion] = nueva;
+        return true;
+    }
+
+    public boolean eliminar(int posicion) {
+        if (posicion < 0 || posicion >= cantidad) {
+            return false;
+        }
+        for (int i = posicion; i < cantidad - 1; i++) {
+            lecturas[i] = lecturas[i + 1];
+        }
+        lecturas[cantidad - 1] = null;
+        cantidad--;
+        return true;
+    }
+
+    public int tamano() {
+        return cantidad;
+    }
+
+    public int getCapacidadActual() {
         return lecturas.length;
+    }
+
+    public int getCopiasRealizadas() {
+        return copiasRealizadas;
+    }
+
+    public int getRedimensionamientos() {
+        return redimensionamientos;
     }
 }

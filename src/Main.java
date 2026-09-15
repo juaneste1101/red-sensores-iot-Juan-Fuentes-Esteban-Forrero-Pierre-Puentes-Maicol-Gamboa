@@ -4,40 +4,23 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== INICIANDO SISTEMA DE MONITOREO AMBIENTAL (SEMANA 02) ===");
         
-        String rutaArchivo = "data/lecturas.csv";
+        String ruta = "data/lecturas.csv";
+        String[] listaEstaciones = {"EST-001", "EST-002", "EST-003", "EST-004", "EST-005", "EST-006", "EST-007", "EST-008", "EST-009"};
+        
+        RepositorioLecturas repositorio = new RepositorioLecturas(10);
+        AnalizadorMatriz analizador = new AnalizadorMatriz(listaEstaciones);
 
         ProcesadorIngesta procesador = new ProcesadorIngesta();
-        procesador.procesarArchivo(rutaArchivo);
+        procesador.procesarArchivo(ruta, repositorio, analizador);
 
-        // 1. Cargar lecturas válidas en el Repositorio Dinámico (TAD)
-        RepositorioLecturas repositorio = new RepositorioLecturas();
-        for (LecturaSensor lectura : procesador.getLecturasValidas()) {
-            repositorio.agregar(lectura);
-        }
+        System.out.println("\n--- ESTADO DEL REPOSITORIO DINÁMICO (TAD) ---");
+        System.out.println("Lecturas almacenadas: " + repositorio.tamano());
+        System.out.println("Capacidad final del arreglo: " + repositorio.getCapacidadActual());
+        System.out.println("Redimensionamientos realizados: " + repositorio.getRedimensionamientos());
+        System.out.println("Copias de elementos realizadas: " + repositorio.getCopiasRealizadas());
 
-        System.out.println("\n--- ESTADO DEL REPOSITOIO DINÁMICO (TAD) ---");
-        System.out.println("Elementos almacenados: " + repositorio.getTamanio());
-        System.out.println("Capacidad actual del arreglo: " + repositorio.getCapacidad());
-
-        // 2. Cargar lecturas válidas en la Matriz Estación x Hora
-        String[] estaciones = {"EST-001", "EST-002", "EST-003", "EST-004"};
-        MatrizEstacionHora matriz = new MatrizEstacionHora(estaciones);
-
-        for (int i = 0; i < repositorio.getTamanio(); i++) {
-            LecturaSensor l = repositorio.obtener(i);
-            // Extraer la hora del timestamp (ejemplo formato: "YYYY-MM-DD HH:mm")
-            try {
-                String[] partesFechaHora = l.getTimestamp().split(" ");
-                if (partesFechaHora.length > 1) {
-                    int hora = Integer.parseInt(partesFechaHora[1].split(":")[0]);
-                    matriz.registrarMedicion(l.getIdSensor(), hora, l.getPm25());
-                }
-            } catch (Exception e) {
-                System.out.println("No se pudo parsear la hora para el registro: " + l.getIdSensor());
-            }
-        }
-
-        // Mostrar la matriz en consola
-        matriz.mostrarMatriz();
+        System.out.println("\n--- RESULTADOS ANÁLISIS MATRIZ (SIN CERO FANTASMA) ---");
+        System.out.printf("Promedio EST-003 (sin ceros fantasma): %.2f\n", analizador.promedioDeEstacion(2));
+        System.out.println("Hora más contaminada de la ciudad: " + analizador.horaMasContaminada() + ":00 hrs");
     }
 }

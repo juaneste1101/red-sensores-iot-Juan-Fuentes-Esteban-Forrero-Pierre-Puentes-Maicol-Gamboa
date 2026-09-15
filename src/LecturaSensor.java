@@ -1,64 +1,26 @@
 package src;
 
 public class LecturaSensor {
-    private String idSensor;
-    private String timestamp;
+    private String idEstacion;
+    private String fechaHora;
     private double temperatura;
     private double humedad;
     private double pm25;
-    private boolean esValida;
-    private String motivoFalla;
 
-    public LecturaSensor(String idSensor, String timestamp, double temperatura, double humedad, double pm25) {
-        this.idSensor = idSensor;
-        this.timestamp = timestamp;
+    public LecturaSensor(String idEstacion, String fechaHora, double temperatura, double humedad, double pm25) {
+        this.idEstacion = idEstacion;
+        this.fechaHora = fechaHora;
         this.temperatura = temperatura;
         this.humedad = humedad;
         this.pm25 = pm25;
-        this.esValida = true;
-        this.motivoFalla = "OK";
-        validarRangosFisicos();
     }
 
-    private void validarRangosFisicos() {
-        if (temperatura == -999) {
-            this.esValida = false;
-            this.motivoFalla = "Sensor desconectado (-999)";
-            return;
-        }
-        if (temperatura < -40 || temperatura > 60) {
-            this.esValida = false;
-            this.motivoFalla = "Temperatura fuera de rango físico";
-            return;
-        }
-
-        if (humedad < 0 || humedad > 100) {
-            this.esValida = false;
-            this.motivoFalla = "Humedad fuera de rango (0-100)";
-            return;
-        }
-
-        if (pm25 < 0) {
-            this.esValida = false;
-            this.motivoFalla = "PM2.5 negativo inválido";
-            return;
-        }
+    public String getIdEstacion() {
+        return idEstacion;
     }
 
-    public boolean isValida() {
-        return esValida;
-    }
-
-    public String getMotivoFalla() {
-        return motivoFalla;
-    }
-
-    public String getIdSensor() {
-        return idSensor;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
+    public String getFechaHora() {
+        return fechaHora;
     }
 
     public double getTemperatura() {
@@ -73,14 +35,21 @@ public class LecturaSensor {
         return pm25;
     }
 
-    @Override
-    public String toString() {
-        if (esValida) {
-            return String.format("[%s] %s - Temp: %.1f°C, Hum: %.1f%%, PM2.5: %.1f", 
-                    idSensor, timestamp, temperatura, humedad, pm25);
-        } else {
-            return String.format("[CUARENTENA] %s %s - Motivo: %s", 
-                    idSensor, timestamp, motivoFalla);
+    // Extrae la hora (0-23) del formato "YYYY-MM-DD HH:MM"
+    public int getHora() {
+        try {
+            String[] partes = fechaHora.split(" ");
+            if (partes.length > 1) {
+                String[] horaMinuto = partes[1].split(":");
+                return Integer.parseInt(horaMinuto[0]);
+            }
+        } catch (Exception e) {
+            // Si la fecha viene solo como hora
+            try {
+                String[] horaMinuto = fechaHora.split(":");
+                return Integer.parseInt(horaMinuto[0]);
+            } catch (Exception ignored) {}
         }
+        return 0;
     }
 }
