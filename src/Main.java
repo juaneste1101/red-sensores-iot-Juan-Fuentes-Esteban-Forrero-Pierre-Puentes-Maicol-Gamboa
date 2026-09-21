@@ -4,7 +4,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== INICIANDO SISTEMA DE MONITOREO AMBIENTAL (SEMANA 02) ===");
         
-        String ruta = "data/lecturas.csv";
+        // Cambiamos el nombre del archivo aquí:
+        String ruta = "data/lecturas_ampliadas.csv";
         String[] listaEstaciones = {"EST-001", "EST-002", "EST-003", "EST-004", "EST-005", "EST-006", "EST-007", "EST-008", "EST-009"};
         
         RepositorioLecturas repositorio = new RepositorioLecturas(10);
