@@ -6,8 +6,34 @@ import java.io.IOException;
 
 public class ProcesadorIngesta {
 
-    public void procesarArchivo(String rutaArchivo, RepositorioLecturas repositorio, AnalizadorMatriz analizador) {
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+    private String rutaArchivo;
+
+    public ProcesadorIngesta() {
+        
+        this.rutaArchivo = "data/lecturas_ampliadas.csv";
+    }
+
+    public ProcesadorIngesta(String rutaArchivo) {
+        this.rutaArchivo = rutaArchivo;
+    }
+
+    public void setRutaArchivo(String rutaArchivo) {
+        this.rutaArchivo = rutaArchivo;
+    }
+
+    public String getRutaArchivo() {
+        return this.rutaArchivo;
+    }
+
+    // Método principal que utiliza la ruta enrutada internamente
+    public void procesarArchivo(RepositorioLecturas repositorio, AnalizadorMatriz analizador) {
+        procesarArchivo(this.rutaArchivo, repositorio, analizador);
+    }
+
+    // Método que ejecuta la lectura del archivo desde la ruta especificada
+    public void procesarArchivo(String ruta, RepositorioLecturas repositorio, AnalizadorMatriz analizador) {
+        this.rutaArchivo = ruta;
+        try (BufferedReader br = new BufferedReader(new FileReader(this.rutaArchivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 linea = linea.trim();
@@ -26,9 +52,9 @@ public class ProcesadorIngesta {
                     double hum = Double.parseDouble(partes[3].trim());
                     double pm25 = Double.parseDouble(partes[4].trim());
 
-                    // Validacion de rangos fisicos
+                    // Validación de rangos físicos
                     if (temp < -50 || temp > 60 || hum < 0 || hum > 100 || pm25 < 0) {
-                        continue; // Fila fuera de rango
+                        continue;
                     }
 
                     LecturaSensor lectura = new LecturaSensor(estacion, fechaHora, temp, hum, pm25);
@@ -45,7 +71,7 @@ public class ProcesadorIngesta {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error al leer el archivo: " + e.getMessage());
+            System.err.println("Error al leer el archivo en la ruta '" + this.rutaArchivo + "': " + e.getMessage());
         }
     }
 }
