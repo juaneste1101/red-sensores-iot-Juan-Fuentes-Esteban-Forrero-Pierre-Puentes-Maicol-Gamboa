@@ -1,69 +1,71 @@
 package src;
 
+/* ============================================================
+   PLATAFORMA DE MONITOREO AMBIENTAL URBANO
+   AnalizadorMatriz - SEMANA 3
+   ============================================================ */
+
 public class AnalizadorMatriz {
 
-    private Double[][] pm25; // Null representa ausencia real de dato
-    private String[] estaciones;
-    private static final int HORAS = 24;
+    private static final int NUM_ESTACIONES = 9;
+    private static final int NUM_HORAS = 24;
 
-    public AnalizadorMatriz(String[] estaciones) {
-        this.estaciones = estaciones;
-        this.pm25 = new Double[estaciones.length][HORAS];
+    private double[][] pm25PorEstacionHora;
+    private boolean[][] hayDato;
+
+    public AnalizadorMatriz() {
+        this.pm25PorEstacionHora = new double[NUM_ESTACIONES][NUM_HORAS];
+        this.hayDato = new boolean[NUM_ESTACIONES][NUM_HORAS];
     }
 
-    private int buscarIndiceEstacion(String idEstacion) {
-        for (int i = 0; i < estaciones.length; i++) {
-            if (estaciones[i].equalsIgnoreCase(idEstacion)) {
-                return i;
-            }
-        }
-        return -1;
+    private int indiceDeEstacion(String idSensor) {
+        String numero = idSensor.substring(4);
+        return Integer.parseInt(numero) - 1;
     }
 
-    public void cargarLectura(LecturaSensor lectura) {
-        if (lectura == null) return;
-        int idxEstacion = buscarIndiceEstacion(lectura.getIdEstacion());
-        if (idxEstacion != -1) {
-            int hora = lectura.getHora();
-            if (hora >= 0 && hora < HORAS) {
-                pm25[idxEstacion][hora] = lectura.getPm25();
-            }
-        }
+    public void registrar(LecturaSensor lectura) {
+        int fila = indiceDeEstacion(lectura.getIdSensor());
+        int columna = lectura.getHora();
+        pm25PorEstacionHora[fila][columna] = lectura.getPm25();
+        hayDato[fila][columna] = true;
     }
 
     public double promedioDeHora(int hora) {
-        if (hora < 0 || hora >= HORAS) return 0.0;
         double suma = 0;
-        int conteo = 0;
-        for (int e = 0; e < estaciones.length; e++) {
-            if (pm25[e][hora] != null) {
-                suma += pm25[e][hora];
-                conteo++;
+        int estacionesQueReportaron = 0;
+        for (int fila = 0; fila < NUM_ESTACIONES; fila++) {
+            if (hayDato[fila][hora]) {
+                suma += pm25PorEstacionHora[fila][hora];
+                estacionesQueReportaron++;
             }
         }
-        return conteo == 0 ? 0.0 : suma / conteo;
+        if (estacionesQueReportaron == 0) return 0;
+        return suma / estacionesQueReportaron;
     }
 
-    public double promedioDeEstacion(int idxEstacion) {
-        if (idxEstacion < 0 || idxEstacion >= estaciones.length) return 0.0;
+    public double promedioDeEstacion(int fila) {
+        if (fila < 0 || fila >= NUM_ESTACIONES) {
+            throw new IndexOutOfBoundsException("Estación inválida: " + fila);
+        }
         double suma = 0;
-        int conteo = 0;
-        for (int h = 0; h < HORAS; h++) {
-            if (pm25[idxEstacion][h] != null) {
-                suma += pm25[idxEstacion][h];
-                conteo++;
+        int horasQueReportaron = 0;
+        for (int h = 0; h < NUM_HORAS; h++) {
+            if (hayDato[fila][h]) {
+                suma += pm25PorEstacionHora[fila][h];
+                horasQueReportaron++;
             }
         }
-        return conteo == 0 ? 0.0 : suma / conteo;
+        if (horasQueReportaron == 0) return 0;
+        return suma / horasQueReportaron;
     }
 
     public int horaMasContaminada() {
         int mejorHora = -1;
-        double maxPromedio = -1.0;
-        for (int h = 0; h < HORAS; h++) {
-            double prom = promedioDeHora(h);
-            if (prom > maxPromedio) {
-                maxPromedio = prom;
+        double mejorPromedio = -1;
+        for (int h = 0; h < NUM_HORAS; h++) {
+            double promedio = promedioDeHora(h);
+            if (promedio > mejorPromedio) {
+                mejorPromedio = promedio;
                 mejorHora = h;
             }
         }

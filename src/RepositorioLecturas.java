@@ -1,35 +1,24 @@
 package src;
 
+/* ============================================================
+   PLATAFORMA DE MONITOREO AMBIENTAL URBANO
+   TAD RepositorioLecturas - SEMANA 3
+   ============================================================ */
+
 public class RepositorioLecturas {
+
+    private static final int CAPACIDAD_INICIAL = 10;
 
     private LecturaSensor[] lecturas;
     private int cantidad;
-    private int copiasRealizadas;
-    private int redimensionamientos;
 
-    public RepositorioLecturas(int capacidadInicial) {
-        this.lecturas = new LecturaSensor[capacidadInicial];
+    public RepositorioLecturas() {
+        this.lecturas = new LecturaSensor[CAPACIDAD_INICIAL];
         this.cantidad = 0;
-        this.copiasRealizadas = 0;
-        this.redimensionamientos = 0;
-    }
-
-    private void redimensionar() {
-        int nuevaCapacidad = lecturas.length * 2;
-        LecturaSensor[] nuevo = new LecturaSensor[nuevaCapacidad];
-        
-        for (int i = 0; i < cantidad; i++) {
-            nuevo[i] = lecturas[i];
-            copiasRealizadas++;
-        }
-        
-        lecturas = nuevo;
-        redimensionamientos++;
     }
 
     public boolean agregar(LecturaSensor lectura) {
-        if (lectura == null) return false;
-        if (cantidad >= lecturas.length) {
+        if (cantidad == lecturas.length) {
             redimensionar();
         }
         lecturas[cantidad] = lectura;
@@ -44,49 +33,54 @@ public class RepositorioLecturas {
         return lecturas[posicion];
     }
 
-    public LecturaSensor buscarPorEstacion(String idEstacion) {
-        if (idEstacion == null) return null;
-        for (int i = 0; i < cantidad; i++) {
-            if (lecturas[i].getIdEstacion().equalsIgnoreCase(idEstacion)) {
-                return lecturas[i];
-            }
-        }
-        return null;
+    public int tamano() {
+        return cantidad;
     }
 
-    public boolean actualizar(int posicion, LecturaSensor nueva) {
-        if (posicion < 0 || posicion >= cantidad || nueva == null) {
-            return false;
-        }
-        lecturas[posicion] = nueva;
-        return true;
-    }
-
-    public boolean eliminar(int posicion) {
+    public void eliminar(int posicion) {
         if (posicion < 0 || posicion >= cantidad) {
-            return false;
+            throw new IndexOutOfBoundsException("Posición inválida: " + posicion);
         }
         for (int i = posicion; i < cantidad - 1; i++) {
             lecturas[i] = lecturas[i + 1];
         }
         lecturas[cantidad - 1] = null;
         cantidad--;
-        return true;
     }
 
-    public int tamano() {
-        return cantidad;
+    public LecturaSensor buscarPorEstacion(String idSensor) {
+        for (int i = 0; i < cantidad; i++) {
+            if (lecturas[i] != null && lecturas[i].getIdSensor().equals(idSensor)) {
+                return lecturas[i];
+            }
+        }
+        return null;
     }
 
-    public int getCapacidadActual() {
-        return lecturas.length;
+    public void actualizar(int posicion, LecturaSensor nueva) {
+        if (posicion < 0 || posicion >= cantidad) {
+            throw new IndexOutOfBoundsException("Posición inválida: " + posicion);
+        }
+        if (nueva == null) {
+            throw new IllegalArgumentException("La lectura no puede ser null");
+        }
+        lecturas[posicion] = nueva;
     }
 
-    public int getCopiasRealizadas() {
-        return copiasRealizadas;
+    private void redimensionar() {
+        LecturaSensor[] nuevo = new LecturaSensor[lecturas.length * 2];
+        for (int i = 0; i < cantidad; i++) {
+            nuevo[i] = lecturas[i];
+        }
+        lecturas = nuevo;
     }
 
-    public int getRedimensionamientos() {
-        return redimensionamientos;
+    public double promedioPm25() {
+        if (cantidad == 0) return 0;
+        double suma = 0;
+        for (int i = 0; i < cantidad; i++) {
+            suma += lecturas[i].getPm25();
+        }
+        return suma / cantidad;
     }
 }
