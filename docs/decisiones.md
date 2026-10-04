@@ -16,3 +16,23 @@ Los identificadores de estación y timestamps se comparan mediante `equals()` y 
 
 ## 5. Medición
 La comparación principal entre algoritmos utiliza el número exacto de comparaciones. El tiempo en milisegundos se conserva como evidencia experimental.
+# Registro de Decisiones de Arquitectura y Diseño
+
+## DEC-04 — Elección del Pivote en QuickSort
+
+**Semana:** 4  
+**Fecha:** 2026-10-03  
+**Integrantes:** Juan Esteban Fuentes Hernández, Esteban Forrero, Pierre Puentes
+
+### Problema
+QuickSort con pivote fijo en el primer elemento genera un árbol de recursión de profundidad \(O(n)\) cuando los datos ingresan ordenados cronológicamente (como ocurre de forma natural en la red de sensores IoT), provocando un `StackOverflowError` al agotar la pila de la JVM.
+
+### Alternativas Consideradas
+1. **Pivote Aleatorio:** Seleccionar una posición al azar en el rango \([inicio, fin]\).
+2. **Mediana de Tres:** Comparar el elemento inicial, central y final, utilizando el valor intermedio como pivote.
+
+### Decisión
+Se decide implementar la estrategia de **Mediana de Tres** (o Pivote Aleatorio) en el método de particionamiento.
+
+### Justificación
+Previene el peor caso cuadrático \(O(n^2)\) y la recursión profunda cuando las lecturas llegan cronológicamente, manteniendo la complejidad en \(O(n \log n)\) y un tiempo de ejecución menor a 100 ms sin desbordar la pila.
